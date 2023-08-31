@@ -23,21 +23,6 @@ const bot = new Client({
     ]
 })
 
-const commands = [
-    {
-        name: 'resim',
-        description: 'Yapay zeka ile resim oluşturur.',
-        options: [
-            {
-                name: "promt",
-                description: "Komut",
-                type: ApplicationCommandOptionType.String,
-                required: true
-            }
-        ]
-    }
-]
-
 const rest = new REST({ version: '10' }).setToken(token);
 console.log("Komutlar ekleniyor...");
 
