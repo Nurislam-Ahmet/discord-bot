@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        body {
+            margin: 0;
+            padding-bottom: 3rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #form {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.25rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 3rem;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        #input {
+            border: none;
+            padding: 0 1rem;
+            flex-grow: 1;
+            border-radius: 2rem;
+            margin: 0.25rem;
+        }
+
+        #input:focus {
+            outline: none;
+        }
+
+        #form>button {
+            font-size: 18px;
+            background: #333;
+            border: none;
+            padding: 0 1rem;
+            margin: 0.25rem;
+            border-radius: 3px;
+            outline: none;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages>li {
+            padding: 0.5rem 1rem;
+        }
+
+        #messages>li:nth-child(odd) {
+            background: #efefef;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <input id="input" autocomplete="off" /><button>Gönder</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var messages = document.getElementById('messages');
+
+        function setCookie(cname, cvalue) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toGMTString();
+            document.cookie = cname + "=" + cvalue + ";" + ";path=/";
+        }
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        if (!localStorage.getItem("name")) {
+            adAlma()
+        }
+
+        let mesajs = localStorage.getItem("mesajlar").split("&");
+        mesajs.pop()
+        mesajs.forEach(items => {
+            let i = items.split(",")
+            var item = document.createElement('li');
+            item.innerHTML = `<i><strong>${i[0]}:</strong></i> ${i[1]}`;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });        
+
+        function adAlma() {
+            let ad = prompt("Adınızı girin:");
+            if (ad != null && ad.trim() != "") {
+                localStorage.setItem("name", ad)
+                localStorage.setItem("mesajlar", "")
+            } else {
+                adAlma()
+            }
+        }
+
+        var form = document.getElementById('form');
+        var input = document.getElementById('input');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', { ad: localStorage.getItem("name"), mesaj: input.value });
+                input.value = '';
+            }
+        });
+
+        socket.on('chat message', function (msg) {
+            var item = document.createElement('li');
+            item.innerHTML = `<i><strong>${msg.ad}:</strong></i> ${msg.mesaj}`;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+            let mesajlar = localStorage.getItem("mesajlar");
+            localStorage.removeItem("mesajlar");
+            mesajlar += `${msg.ad},${msg.mesaj}&`;
+            localStorage.setItem("mesajlar",mesajlar);
+
+        });
+    </script>
+</body>
+
+</html>
