@@ -23,16 +23,6 @@ const bot = new Client({
     ]
 })
 
-const rest = new REST({ version: '10' }).setToken(token);
-console.log("Komutlar ekleniyor...");
-
-rest.put(
-    Routes.applicationGuildCommands("1134461276521762896", "1010563754389414010"),
-    { body: commands }
-)
-
-console.log("Komutlar eklendi!");
-
 bot.on('ready', () => {
     console.log("Bot hazır!");
 })
